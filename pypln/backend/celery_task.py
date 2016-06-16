@@ -34,6 +34,7 @@ from pypln.backend import config
 mongo_client = pymongo.MongoClient(host=config.MONGODB_URIS)
 database = mongo_client[config.MONGODB_DBNAME]
 document_collection = database[config.MONGODB_COLLECTION]
+corpora_collection = database[config.MONGODB_CORPORA_COLLECTION]
 
 class DocumentNotFound(Exception):
     pass
@@ -67,5 +68,36 @@ class PyPLNTask(Task):
         performing the analysis itself. It will receive a dictionary as a
         paramenter (containing all the current information on the document)
         and must return a dictionary with the keys to be saved in the database.
+        """
+        raise NotImplementedError
+
+class PyPLNCorpusTask(Task):
+    """
+    This is the base class for a Corpus task. It is very similar to
+    `PyPLNTask`, but it needs a corpus_id and a list of document_ids.
+    """
+
+    def run(self, corpus_id, document_ids):
+        """
+        This method is called by Celery, and should not be overridden.
+        It will call the `process` method with a list of dictionaries
+        containing all the documents and will update de database with results.
+        """
+        documents = document_collection.find({"_id": {"$in": document_ids}})
+        if documents is None:
+            self.retry(exc=DocumentNotFound('Documents with ids "{}" '
+                'not found in database'.format(document_ids)))
+        result = self.process(documents)
+        corpora_collection.update({"corpus_id": corpus_id}, {"$set": result},
+                upsert=True)
+        return corpus_id, document_ids
+
+    def process(self, documents):
+        """
+        This method should be implemented by subclasses. It is responsible for
+        performing the analysis itself. It will receive a list of dictionaries
+        as a paramenter (containing all the documents and the analysis that are
+        ready for it) and must return a dictionary with the new keys to be
+        saved in the corpora analysis collection.
         """
         raise NotImplementedError

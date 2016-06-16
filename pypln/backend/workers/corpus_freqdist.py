@@ -16,22 +16,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from pypln.backend.celery_task import PyPLNCorpusTask
 
-from extractor import Extractor
-from tokenizer import Tokenizer
-from freqdist import FreqDist
-from pos import POS
-from statistics import Statistics
-from bigrams import Bigrams
-from palavras_raw import PalavrasRaw
-from lemmatizer_pt import Lemmatizer
-from palavras_noun_phrase import NounPhrase
-from palavras_semantic_tagger import SemanticTagger
-from word_cloud import WordCloud
-from elastic_indexer import ElasticIndexer
-from corpus_freqdist import CorpusFreqDist
+from collections import Counter
 
+class CorpusFreqDist(PyPLNCorpusTask):
 
-__all__ = ['Extractor', 'Tokenizer', 'FreqDist', 'POS', 'Statistics',
-        'Bigrams', 'PalavrasRaw', 'Lemmatizer', 'NounPhrase', 'SemanticTagger',
-        'WordCloud', 'ElasticIndexer', 'CorpusFreqDist']
+    def process(self, documents):
+        result = Counter()
+        for document in documents:
+            d = {}
+            for word, count in document['freqdist']:
+                d[word] = count
+            result += Counter(d)
+        return {'freqdist': result.most_common()}

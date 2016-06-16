@@ -34,6 +34,7 @@ class TaskTest(unittest.TestCase):
         app.conf.update(CELERY_ALWAYS_EAGER=True)
         self.db = pymongo.Connection()[self.db_name]
         self.collection = self.db[config.MONGODB_COLLECTION]
+        self.corpora_collection = self.db[config.MONGODB_CORPORA_COLLECTION]
 
     def tearDown(self):
         self.collection.remove({})
