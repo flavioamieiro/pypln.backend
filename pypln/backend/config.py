@@ -31,7 +31,7 @@ MONGODB_URIS = config('MONGODB_URIS', default='mongodb://localhost:27017',
         cast=split_uris)
 MONGODB_DBNAME = config('MONGODB_DBNAME', default='pypln')
 MONGODB_COLLECTION =  config('MONGODB_COLLECTION', default='analysis')
-MONGODB_CORPORA_COLLECTION =  config('MONGODB_COLLECTION',
+MONGODB_CORPORA_COLLECTION =  config('MONGODB_CORPORA_COLLECTION',
         default='corpora_analysis')
 
 ELASTICSEARCH_CONFIG = {
