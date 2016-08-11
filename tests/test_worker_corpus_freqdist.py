@@ -30,19 +30,14 @@ class TestCorpusFreqDistWorker(TaskTest):
                 [u'over', 1], [u'fox', 1], [u'dog', 1], [u'.', 1],
                 [u'quick', 1], [u'jumps', 1]]
 
-        corpus_fd =  [[u'the', 4], [u'is', 2], [u'.', 2], [u'blue', 1],
-                [u'brown', 1], [u'lazy', 1], [u'fox', 1], [u'jumps', 1],
-                [u'sun', 1], [u'dog', 1], [u'sky', 1], [u',', 1],
-                [u'yellow', 1], [u'quick', 1], [u'over', 1]]
+        corpus_fd =  [(u'the', 4), (u'is', 2), (u'.', 2), (u'blue', 1),
+                (u'brown', 1), (u'lazy', 1), (u'fox', 1), (u'jumps', 1),
+                (u'sun', 1), (u'dog', 1), (u'sky', 1), (u',', 1),
+                (u'yellow', 1), (u'quick', 1), (u'over', 1)]
 
-        doc_id_1 = self.collection.insert({'freqdist': freqdist_1}, w=1)
-        doc_id_2 = self.collection.insert({'freqdist': freqdist_2}, w=1)
-        fake_corpus_id = 1
+        result = CorpusFreqDist().process([{'freqdist': freqdist_1},
+            {'freqdist': freqdist_2}])
 
-
-        CorpusFreqDist().delay(fake_corpus_id, [doc_id_1, doc_id_2])
-
-        resulting_corpus_fd = self.corpora_collection.find_one(
-                {'corpus_id': fake_corpus_id})['freqdist']
+        resulting_corpus_fd = result['freqdist']
 
         self.assertEqual(resulting_corpus_fd, corpus_fd)
