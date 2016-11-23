@@ -27,7 +27,7 @@ from subprocess import Popen, PIPE
 from mimetypes import guess_type
 from re import compile as regexp_compile, DOTALL, escape
 
-import cld
+import cld2
 import magic
 
 from pypln.backend.celery_task import PyPLNTask
@@ -204,9 +204,9 @@ class Extractor(PyPLNTask):
         text = clean(text)
 
         if isinstance(text, unicode):
-            language = cld.detect(text.encode('utf-8'))[1]
+            language = cld2.detect(text.encode('utf-8'))[1]
         else:
-            language = cld.detect(text)[1]
+            language = cld2.detect(text)[1]
 
         return {'text': text, 'file_metadata': metadata, 'language': language,
                 'mimetype': file_mime_type, 'forced_decoding': forced_decoding}
