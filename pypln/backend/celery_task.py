@@ -31,7 +31,7 @@ from pypln.backend.celery_app import app
 from pypln.backend import config
 
 
-mongo_client = pymongo.MongoClient(host=config.MONGODB_URIS)
+mongo_client = pymongo.MongoClient(host=config.MONGODB_URIS, _connect=False)
 database = mongo_client[config.MONGODB_DBNAME]
 document_collection = database[config.MONGODB_COLLECTION]
 
