@@ -25,7 +25,7 @@ class FakeTask(PyPLNTask):
         return {'result': document['input']}
 
 class TestCeleryTask(TaskTest):
-    def test_task_should_get_the_correct_document(self):
+    def test_saves_returned_data_to_database(self):
         """This is a regression test. PyPLNTask was not filtering by _id. It
         was getting the first document it found. """
 
@@ -36,8 +36,10 @@ class TestCeleryTask(TaskTest):
         FakeTask().delay(correct_doc_id)
 
         refreshed_doc = self.collection.find_one({'_id': correct_doc_id})
+        refreshed_wrong_doc = self.collection.find_one({'_id': wrong_doc_id})
 
         self.assertEqual(refreshed_doc['result'], 'correct')
+        self.assertNotIn('result', refreshed_wrong_doc.keys())
 
     @mock.patch.object(FakeTask, 'process')
     def test_should_get_current_data_from_database(self, mocked_process):
