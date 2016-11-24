@@ -39,14 +39,15 @@ class PalavrasRaw(PyPLNTask):
 
         text = document['text']
 
-        # For some reason, in some pypln installations the document['text'] is
-        # not always unicode as it should be. This may be due to errors during
-        # the decoding process that we fixed earlier. That meant that, when we
-        # got a non-unicode string, python would try to decode it using the
-        # default codec (ascii) in `text.encode(PALAVRAS_ENCODING)`. Since we
-        # know the text came from mongodb, we can just decode it using utf-8 to
-        # make sure we have a unicode object.
-        if not isinstance(text, str):
+        # This code is here because when using python2 for some
+        # reason, sometimes document['text'] was not a unicode object
+        # (as it should be, coming from pymongo).  Since we're now
+        # using python3, we should really always get a str (unicode)
+        # object. But, since we do not know the real reason for the
+        # original error, we will keep this code here for now. As
+        # before, if we receive a bytes object, since it came from
+        # mongodb we can be sure it will be encoded in utf-8.
+        if isinstance(text, bytes):
             text = text.decode('utf-8')
 
         process = subprocess.Popen([BASE_PARSER, PARSER_MODE],
@@ -55,4 +56,4 @@ class PalavrasRaw(PyPLNTask):
                                    stderr=subprocess.PIPE)
         stdout, stderr = process.communicate(text.encode(PALAVRAS_ENCODING))
 
-        return {'palavras_raw': stdout, 'palavras_raw_ran': True}
+        return {'palavras_raw': stdout.decode('utf-8'), 'palavras_raw_ran': True}
