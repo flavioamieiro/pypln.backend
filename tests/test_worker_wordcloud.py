@@ -18,7 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 import base64
-from io import StringIO
+from io import BytesIO
 
 from PIL import Image
 
@@ -37,7 +37,7 @@ class TestFreqDistWorker(TaskTest):
         refreshed_document = self.collection.find_one({'_id': doc_id})
         raw_png_data = base64.b64decode(refreshed_document['wordcloud'])
 
-        fake_file = StringIO(raw_png_data)
+        fake_file = BytesIO(raw_png_data)
         img = Image.open(fake_file)
         img.verify()
         self.assertEqual(img.format, 'PNG')

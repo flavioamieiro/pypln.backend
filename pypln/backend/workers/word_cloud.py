@@ -19,7 +19,7 @@
 
 import base64
 import string
-from io import StringIO
+from io import BytesIO
 
 import numpy
 import nltk
@@ -41,7 +41,7 @@ class WordCloud(PyPLNTask):
         words = numpy.array([t[0] for t in fdist])
         counts = numpy.array([t[1] for t in fdist])
         wordcloud_img = make_wordcloud(words, counts)
-        fd = StringIO()
+        fd = BytesIO()
         wordcloud_img.save(fd, format="PNG")
         fd.seek(0)
         result = {'wordcloud': base64.b64encode(fd.read())}
