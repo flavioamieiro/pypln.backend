@@ -53,7 +53,7 @@ class TestPalavrasRawWorker(TaskTest):
         doc_id = self.collection.insert(
                 {'text': 'Eu sei que neste momento falo para todo Brasil.',
                     'language': 'pt'}, w=1)
-        expected_raw = dedent('''
+        expected_raw = dedent(b'''
         Eu 	[eu] <*> PERS M/F 1S NOM @SUBJ>  #1->2
         sei 	[saber] <fmc> <mv> V PR 1S IND VFIN @FS-STA  #2->0
         que 	[que] <clb> <clb-fs> KS @SUB  #3->7
