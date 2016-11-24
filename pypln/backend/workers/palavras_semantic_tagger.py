@@ -425,7 +425,7 @@ class SemanticTagger(PyPLNTask):
             word_sem_tags = angle_brackets_contents.findall(line.strip())
             is_tagged = False
             for tag in word_sem_tags:
-                for category, subcategories in list(SEMANTIC_TAGS.items()):
+                for category, subcategories in SEMANTIC_TAGS.items():
                     if tag in subcategories:
                         tagged_entities.setdefault(category, []).append(word)
                         is_tagged = True
