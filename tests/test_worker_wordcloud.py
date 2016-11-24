@@ -19,23 +19,20 @@
 
 import base64
 from io import BytesIO
+import unittest
 
 from PIL import Image
 
 from pypln.backend.workers import WordCloud
-from .utils import TaskTest
 
 
-class TestFreqDistWorker(TaskTest):
-    name = "WordCloud"
+class TestFreqDistWorker(unittest.TestCase):
     def test_wordcloud_should_return_a_base64_encoded_png(self):
         doc = {'freqdist':  [('is', 2), ('the', 2), ('blue', 1), ('sun', 1),
             ('sky', 1), (',', 1), ('yellow', 1), ('.', 1)], 'language': 'en'}
-        doc_id = self.collection.insert(doc, w=1)
-        WordCloud().delay(doc_id)
+        result = WordCloud().process(doc)
 
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        raw_png_data = base64.b64decode(refreshed_document['wordcloud'])
+        raw_png_data = base64.b64decode(result['wordcloud'])
 
         fake_file = BytesIO(raw_png_data)
         img = Image.open(fake_file)
