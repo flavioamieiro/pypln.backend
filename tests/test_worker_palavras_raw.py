@@ -22,7 +22,7 @@ from unittest import skipIf
 from textwrap import dedent
 
 from pypln.backend.workers import palavras_raw
-from utils import TaskTest
+from .utils import TaskTest
 
 
 ORIGINAL_PATH = palavras_raw.BASE_PARSER

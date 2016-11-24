@@ -18,8 +18,8 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import en_nltk
-import pt_palavras
+from . import en_nltk
+from . import pt_palavras
 from pypln.backend.workers.palavras_raw import palavras_installed
 from pypln.backend.celery_task import PyPLNTask
 
@@ -48,7 +48,7 @@ class POS(PyPLNTask):
         if language in MAPPING:
             tagset, tagged_text = MAPPING[language](document)
             text = document['text']
-            if not isinstance(text, unicode):
+            if not isinstance(text, str):
                 text = text.decode('utf-8')
             tagged_text_with_offset = put_offset(text, tagged_text)
         return {'pos': tagged_text_with_offset, 'tagset': tagset}

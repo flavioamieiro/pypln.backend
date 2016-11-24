@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from extractor import Extractor
-from tokenizer import Tokenizer
-from freqdist import FreqDist
-from pos import POS
-from statistics import Statistics
-from bigrams import Bigrams
-from palavras_raw import PalavrasRaw
-from lemmatizer_pt import Lemmatizer
-from palavras_noun_phrase import NounPhrase
-from palavras_semantic_tagger import SemanticTagger
-from word_cloud import WordCloud
-from elastic_indexer import ElasticIndexer
+from .extractor import Extractor
+from .tokenizer import Tokenizer
+from .freqdist import FreqDist
+from .pos import POS
+from .statistics import Statistics
+from .bigrams import Bigrams
+from .palavras_raw import PalavrasRaw
+from .lemmatizer_pt import Lemmatizer
+from .palavras_noun_phrase import NounPhrase
+from .palavras_semantic_tagger import SemanticTagger
+from .word_cloud import WordCloud
+from .elastic_indexer import ElasticIndexer
 
 
 __all__ = ['Extractor', 'Tokenizer', 'FreqDist', 'POS', 'Statistics',

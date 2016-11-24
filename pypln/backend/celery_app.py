@@ -19,7 +19,7 @@
 
 from celery import Celery
 from kombu import Exchange, Queue
-import config
+from . import config
 
 app = Celery('pypln_workers', backend='mongodb',
         broker='amqp://', include=['pypln.backend.workers'])

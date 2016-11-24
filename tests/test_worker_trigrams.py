@@ -18,9 +18,9 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 import nltk
-import cPickle
+import pickle
 from pypln.backend.workers.trigrams import Trigrams
-from utils import TaskTest
+from .utils import TaskTest
 
 trigram_measures = nltk.collocations.TrigramAssocMeasures()
 
@@ -33,7 +33,7 @@ class TestTrigramWorker(TaskTest):
         Trigrams().delay(doc_id)
         refreshed_document = self.collection.find_one({'_id': doc_id})
         trigram_rank = refreshed_document['trigram_rank']
-        result = trigram_rank[u'olive leaf plucked'][0]
+        result = trigram_rank['olive leaf plucked'][0]
         # This is the value of the chi_sq measure for this trigram in this
         # colocation
         expected_chi_sq = 1940754916.9623578
@@ -45,7 +45,7 @@ class TestTrigramWorker(TaskTest):
         Trigrams().delay(doc_id)
         refreshed_document = self.collection.find_one({'_id': doc_id})
         trigram_rank = refreshed_document['trigram_rank']
-        result = trigram_rank[u'\dollarsign test \dot'][0]
+        result = trigram_rank['\dollarsign test \dot'][0]
         # This is the value of the chi_sq measure for this trigram in this
         # colocation
         expected_chi_sq = 10.5

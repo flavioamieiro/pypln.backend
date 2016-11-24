@@ -20,7 +20,7 @@
 import base64
 import shlex
 
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from tempfile import NamedTemporaryFile
 from os import unlink
 from subprocess import Popen, PIPE
@@ -84,7 +84,7 @@ def parse_html(html, remove_tags=None, remove_inside=None,
                     [''] * (total_to_remove - 2)
             content_between[index + 1] = '\n'
     complete_tags.append('')
-    result = ''.join(sum(zip(content_between, complete_tags), tuple()))
+    result = ''.join(sum(list(zip(content_between, complete_tags)), tuple()))
     return clean(result)
 
 def get_pdf_metadata(data):
@@ -193,7 +193,7 @@ class Extractor(PyPLNTask):
 
         text, forced_decoding = trial_decode(text)
 
-        if isinstance(text, unicode):
+        if isinstance(text, str):
             # HTMLParser only handles unicode objects. We can't pass the text
             # through it if we don't know the encoding, and it's possible we
             # also shouldn't. There's no way of knowing if it's a badly encoded
@@ -203,7 +203,7 @@ class Extractor(PyPLNTask):
 
         text = clean(text)
 
-        if isinstance(text, unicode):
+        if isinstance(text, str):
             language = cld.detect(text.encode('utf-8'))[1]
         else:
             language = cld.detect(text)[1]

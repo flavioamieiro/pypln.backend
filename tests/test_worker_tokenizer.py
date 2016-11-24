@@ -18,7 +18,7 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 from pypln.backend.workers import Tokenizer
-from utils import TaskTest
+from .utils import TaskTest
 
 
 class TestTokenizerWorker(TaskTest):

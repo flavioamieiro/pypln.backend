@@ -45,11 +45,11 @@ class Trigrams(PyPLNTask):
                 # We cannot store the trigram as a tuple (mongo keys need to be
                 # strings). We decided to join tokens using spaces since a
                 # space will never be in a token.
-                key = u' '.join(res[0])
+                key = ' '.join(res[0])
                 # Mongo cannot have `.` or `$` in key names. Unfortunatelly
                 # this means we need to replace them with placeholders.
-                key = key.replace(u'$', u'\dollarsign')
-                key = key.replace(u'.', u'\dot')
+                key = key.replace('$', '\dollarsign')
+                key = key.replace('.', '\dot')
                 tr[key].append(res[1])
 
         return {'trigram_rank': tr, 'metrics':metrics}

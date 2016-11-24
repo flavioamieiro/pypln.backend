@@ -46,7 +46,7 @@ class PalavrasRaw(PyPLNTask):
         # default codec (ascii) in `text.encode(PALAVRAS_ENCODING)`. Since we
         # know the text came from mongodb, we can just decode it using utf-8 to
         # make sure we have a unicode object.
-        if not isinstance(text, unicode):
+        if not isinstance(text, str):
             text = text.decode('utf-8')
 
         process = subprocess.Popen([BASE_PARSER, PARSER_MODE],

@@ -40,7 +40,7 @@ class NounPhrase(PyPLNTask):
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         palavras_output = document['palavras_raw']
-        if isinstance(palavras_output, unicode):
+        if isinstance(palavras_output, str):
             # we *need* to send a 'str' to the process. Otherwise it's going to try to use ascii.
             palavras_output = palavras_output.encode('utf-8')
         stdout, stderr = process.communicate(palavras_output)

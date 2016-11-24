@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-u"""
+"""
 Created on 20/05/15
 by fccoelho
 license: GPL V3 or Later

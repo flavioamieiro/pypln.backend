@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import print_function
+
 import sys
 from logging import Logger, StreamHandler, Formatter
 from pymongo import Connection

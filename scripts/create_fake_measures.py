@@ -25,17 +25,17 @@ from pymongo import Connection
 
 data = \
 {'host': {'cpu': {'cpu percent': 4.9, 'number of cpus': 4},
-          'memory': {'buffers': 214372352L,
+          'memory': {'buffers': 214372352,
                      'cached': 919220224,
-                     'free': 1369661440L,
+                     'free': 1369661440,
                      'free virtual': 0,
                      'percent': 65.21955293723627,
-                     'real free': 2503254016L,
+                     'real free': 2503254016,
                      'real percent': 36.433711831634305,
-                     'real used': 1434767360L,
-                     'total': 3938021376L,
+                     'real used': 1434767360,
+                     'total': 3938021376,
                      'total virtual': 0,
-                     'used': 2568359936L,
+                     'used': 2568359936,
                      'used virtual': 0},
           'network': {'cluster ip': '127.0.0.1',
                       'interfaces': {'eth0': {'bytes received': 171472224,
@@ -105,8 +105,8 @@ data = \
 def populate_collection():
     db[collection_name].drop()
     collection = db[collection_name]
-    print '[{}] Inserting total of {} measures ({} for {} brokers)...'\
-            .format(asctime(), measures * brokers, measures, brokers)
+    print('[{}] Inserting total of {} measures ({} for {} brokers)...'\
+            .format(asctime(), measures * brokers, measures, brokers))
     for measure in range(1, measures + 1):
         for broker in range(1, brokers + 1):
             if '_id' in data:
@@ -117,17 +117,17 @@ def populate_collection():
                                 random()
             collection.insert(data)
         if measure % 10000 == 0:
-            print '  [{}] Inserted {} measures'.format(asctime(),
-                    measure * broker)
-    print '[{}] Done inserting measures!'.format(asctime())
+            print('  [{}] Inserted {} measures'.format(asctime(),
+                    measure * broker))
+    print('[{}] Done inserting measures!'.format(asctime()))
 
-    print '[{}] Creating index for "host.network.cluster ip"'.format(asctime())
+    print('[{}] Creating index for "host.network.cluster ip"'.format(asctime()))
     collection.ensure_index('host.network.cluster ip')
-    print '[{}] Done!'.format(asctime())
+    print('[{}] Done!'.format(asctime()))
 
-    print '[{}] Creating index for "timestamp"'.format(asctime())
+    print('[{}] Creating index for "timestamp"'.format(asctime()))
     collection.ensure_index([('timestamp', -1)])
-    print '[{}] Done!'.format(asctime())
+    print('[{}] Done!'.format(asctime()))
 
 database_name = 'pypln'
 collection_name = 'monitoring' # WARNING: it'll drop the collection!
@@ -149,10 +149,10 @@ broker_ips = list(collection.find(match, {'host.network.cluster ip': 1})\
         .distinct('host.network.cluster ip'))
 end_time = time()
 total_time = end_time - start_time
-print 'Time to get broker IPs: {}. Broker IPs: {}'.format(total_time,
-        ', '.join(broker_ips))
+print('Time to get broker IPs: {}. Broker IPs: {}'.format(total_time,
+        ', '.join(broker_ips)))
 
-print '[{}] Getting last measure for each broker...'.format(asctime())
+print('[{}] Getting last measure for each broker...'.format(asctime()))
 measures = {}
 start_time = time()
 for broker_ip in broker_ips:
@@ -162,7 +162,7 @@ for broker_ip in broker_ips:
     measures[broker_ip] = result
 end_time = time()
 total_time = end_time - start_time
-print '[{}] Time to get all information: {}'.format(asctime(), total_time)
-for broker_ip, measure_list in measures.iteritems():
-    print 'Broker: {}, measure: {}'.format(broker_ip, measure_list[0])
+print('[{}] Time to get all information: {}'.format(asctime(), total_time))
+for broker_ip, measure_list in measures.items():
+    print('Broker: {}, measure: {}'.format(broker_ip, measure_list[0]))
 connection.close()

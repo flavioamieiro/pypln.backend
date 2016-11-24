@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from pypln.backend.celery_task import PyPLNTask
-from utils import TaskTest
+from .utils import TaskTest
 
 class FakeTask(PyPLNTask):
     def process(self, document):

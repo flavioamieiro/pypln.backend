@@ -45,4 +45,4 @@ class Bigrams(PyPLNTask):
         for m in metrics:
             for res in bigram_finder.score_ngrams(getattr(bigram_measures,m)):
                 br[res[0]].append(res[1])
-        return {'metrics': metrics, 'bigram_rank': br.items()}
+        return {'metrics': metrics, 'bigram_rank': list(br.items())}

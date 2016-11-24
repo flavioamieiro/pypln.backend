@@ -22,7 +22,7 @@ from unittest import skipIf
 from textwrap import dedent
 from pypln.backend.workers.palavras_raw import palavras_installed
 from pypln.backend.workers import POS
-from utils import TaskTest
+from .utils import TaskTest
 
 
 class TestPosWorker(TaskTest):
@@ -56,7 +56,7 @@ class TestPosWorker(TaskTest):
         ''').strip() + '\n\n'
 
         # '.' is the only named entity here.
-        expected = [[u'.', u'.', 29]]
+        expected = [['.', '.', 29]]
         doc_id = self.collection.insert({'text': text, 'tokens': tokens,
             'language': 'pt', 'palavras_raw': palavras_raw}, w=1)
         POS().delay(doc_id)

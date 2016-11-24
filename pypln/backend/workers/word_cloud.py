@@ -19,7 +19,7 @@
 
 import base64
 import string
-from StringIO import StringIO
+from io import StringIO
 
 import numpy
 import nltk
@@ -32,7 +32,7 @@ def filter_stopwords(fdist, lang):
     stopwords =  list(string.punctuation)
     if lang in long_name:
         stopwords += nltk.corpus.stopwords.words(long_name[lang])
-    return filter(lambda pair: pair[0].lower() not in stopwords, fdist)
+    return [pair for pair in fdist if pair[0].lower() not in stopwords]
 
 class WordCloud(PyPLNTask):
 

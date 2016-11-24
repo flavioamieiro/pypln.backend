@@ -3,14 +3,14 @@ import os
 from decouple import config, Csv
 
 try:
-    import urlparse
+    import urllib.parse
 except ImportError:
     import urllib.parse as urlparse
 
 def parse_url(url):
-    urlparse.uses_netloc.append('mongodb')
-    urlparse.uses_netloc.append('celery')
-    url = urlparse.urlparse(url)
+    urllib.parse.uses_netloc.append('mongodb')
+    urllib.parse.uses_netloc.append('celery')
+    url = urllib.parse.urlparse(url)
 
     path = url.path[1:]
     path = path.split('?', 2)[0]

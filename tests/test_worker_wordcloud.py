@@ -18,12 +18,12 @@
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 
 import base64
-from StringIO import StringIO
+from io import StringIO
 
 from PIL import Image
 
 from pypln.backend.workers import WordCloud
-from utils import TaskTest
+from .utils import TaskTest
 
 
 class TestFreqDistWorker(TaskTest):

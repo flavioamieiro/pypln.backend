@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from pypln.backend.workers import FreqDist
-from utils import TaskTest
+from .utils import TaskTest
 
 
 class TestFreqDistWorker(TaskTest):
     def test_freqdist_should_return_a_list_of_tuples_with_frequency_distribution(self):
-        tokens = [u'The', u'sky', u'is', u'blue', u',', u'the', u'sun', u'is',
-                  u'yellow', u'.']
+        tokens = ['The', 'sky', 'is', 'blue', ',', 'the', 'sun', 'is',
+                  'yellow', '.']
 
-        expected_fd =  [[u'is', 2], [u'the', 2], [u'blue', 1], [u'sun', 1],
-                [u'sky', 1], [u',', 1], [u'yellow', 1], [u'.', 1]]
+        expected_fd =  [['is', 2], ['the', 2], ['blue', 1], ['sun', 1],
+                ['sky', 1], [',', 1], ['yellow', 1], ['.', 1]]
 
 
         # This is just preparing the expected input in the database

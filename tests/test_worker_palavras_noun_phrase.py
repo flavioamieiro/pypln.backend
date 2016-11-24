@@ -22,7 +22,7 @@ from textwrap import dedent
 
 from pypln.backend.workers import NounPhrase
 from pypln.backend.workers.palavras_raw import palavras_installed
-from utils import TaskTest
+from .utils import TaskTest
 
 
 class TestNounPhraseWorker(TaskTest):

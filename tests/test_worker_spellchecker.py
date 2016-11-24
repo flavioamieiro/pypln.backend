@@ -20,14 +20,14 @@
 import os
 from textwrap import dedent
 from pypln.backend.workers import spellchecker
-from utils import TaskTest
+from .utils import TaskTest
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
 
 
 class TestSpellcheckerWorker(TaskTest):
     def test_spellchek_pt(self):
-        text = u"Meu cachoro é um pastor"
+        text = "Meu cachoro é um pastor"
         doc_id = self.collection.insert({'text': text, 'language': 'pt_BR'},
                 w=1)
         spellchecker.SpellingChecker().delay(doc_id)
@@ -39,7 +39,7 @@ class TestSpellcheckerWorker(TaskTest):
         self.assertEqual(refreshed_document['spelling_errors'][0][1], 4)
 
     def test_spellchek_en(self):
-        text = u"The cat bit the doggyo"
+        text = "The cat bit the doggyo"
         doc_id = self.collection.insert({'text': text, 'language': 'en'}, w=1)
         spellchecker.SpellingChecker().delay(doc_id)
 

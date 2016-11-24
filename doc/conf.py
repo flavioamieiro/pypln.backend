@@ -46,8 +46,8 @@ source_encoding = 'utf-8-sig'
 master_doc = 'index'
 
 # General information about the project.
-project = u'PyPLN'
-copyright = u'2011, Flávio Codeço Coelho'
+project = 'PyPLN'
+copyright = '2011, Flávio Codeço Coelho'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -187,8 +187,8 @@ htmlhelp_basename = 'PyPLNdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'PyPLN.tex', u'PyPLN Documentation',
-   u'Flávio Codeço Coelho', 'manual'),
+  ('index', 'PyPLN.tex', 'PyPLN Documentation',
+   'Flávio Codeço Coelho', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -220,6 +220,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pypln', u'PyPLN Documentation',
-     [u'Flávio Codeço Coelho'], 1)
+    ('index', 'pypln', 'PyPLN Documentation',
+     ['Flávio Codeço Coelho'], 1)
 ]

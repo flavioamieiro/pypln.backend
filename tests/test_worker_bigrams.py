@@ -20,7 +20,7 @@
 import nltk
 
 from pypln.backend.workers.bigrams import Bigrams
-from utils import TaskTest
+from .utils import TaskTest
 
 bigram_measures = nltk.collocations.BigramAssocMeasures()
 

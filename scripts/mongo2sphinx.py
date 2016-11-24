@@ -61,7 +61,7 @@ def serialize(doc,id):
     an unique unsigned integer `id`. We use a counter for this.
     """
     document = Element("sphinx:document", attrib={'id':str(id)})
-    for k,v in doc.iteritems():
+    for k,v in doc.items():
         if k == '_id':
             SubElement(document,k).text = str(v)
             continue

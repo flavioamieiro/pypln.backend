@@ -20,7 +20,7 @@
 from textwrap import dedent
 
 from pypln.backend.workers import SemanticTagger
-from utils import TaskTest
+from .utils import TaskTest
 
 
 class TestSemanticTaggerWorker(TaskTest):
@@ -78,10 +78,10 @@ class TestSemanticTaggerWorker(TaskTest):
         ''').strip() + '\n\n'
 
         expected_tags = {
-                'Non_Tagged': [u'Eu', u'bem', u'enquanto', u'ele', u'está',
-                    u'em', u'o'],
-                'Place and spatial': [u'canto'],
-                'Verbs_related_human_things': [u'canto']
+                'Non_Tagged': ['Eu', 'bem', 'enquanto', 'ele', 'está',
+                    'em', 'o'],
+                'Place and spatial': ['canto'],
+                'Verbs_related_human_things': ['canto']
         }
         doc_id = self.collection.insert({'palavras_raw': palavras_output,
             'palavras_raw_ran': True}, w=1)

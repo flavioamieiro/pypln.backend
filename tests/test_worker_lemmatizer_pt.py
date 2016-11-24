@@ -21,7 +21,7 @@
 from textwrap import dedent
 
 from pypln.backend.workers import Lemmatizer
-from utils import TaskTest
+from .utils import TaskTest
 
 
 class TestLemmatizerWorker(TaskTest):
