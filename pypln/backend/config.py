@@ -1,11 +1,7 @@
 import os
+import urllib.parse
 
 from decouple import config, Csv
-
-try:
-    import urllib.parse
-except ImportError:
-    import urllib.parse as urlparse
 
 def parse_url(url):
     urllib.parse.uses_netloc.append('mongodb')
