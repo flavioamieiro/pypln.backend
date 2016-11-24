@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
 from pypln.backend.celery_task import PyPLNTask
+from unittest import mock
 from .utils import TaskTest
 
 class FakeTask(PyPLNTask):
@@ -37,3 +38,11 @@ class TestCeleryTask(TaskTest):
         refreshed_doc = self.collection.find_one({'_id': correct_doc_id})
 
         self.assertEqual(refreshed_doc['result'], 'correct')
+
+    @mock.patch.object(FakeTask, 'process')
+    def test_should_get_current_data_from_database(self, mocked_process):
+        document = {'input': 'correct'}
+        doc_id = self.collection.insert(document, w=1)
+        self.collection.insert({'input': 'wrong'}, w=1)
+        FakeTask().delay(doc_id)
+        mocked_process.assert_called_with(document)
