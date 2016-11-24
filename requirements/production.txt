@@ -1,5 +1,5 @@
 # Common
-celery
+celery==3.1.23
 pymongo==2.8.1
 
 # Backend
