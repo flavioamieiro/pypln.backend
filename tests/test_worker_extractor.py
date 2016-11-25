@@ -211,12 +211,11 @@ class TestExtractorWorker(TaskTest):
 
     def test_unknown_encoding_should_be_ignored(self):
         filename = os.path.join(DATA_DIR, 'encoding_unknown_to_libmagic.txt')
-        expected = "This file has a weird byte (\x96) that makes it impossible for libmagic to recognize it's encoding."
+        expected = "This file has a weird byte (\x96) that makes it " \
+                   "impossible for libmagic to recognize it's encoding."
         data = {'filename': filename,
-                'contents': base64.b64encode(open(filename).read())}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['text'], expected)
-        self.assertEqual(refreshed_document['file_metadata'], {})
-        self.assertEqual(refreshed_document['language'], 'en')
+                'contents': base64.b64encode(open(filename, 'rb').read())}
+        result = Extractor().process(data)
+        self.assertEqual(result['text'], expected)
+        self.assertEqual(result['file_metadata'], {})
+        self.assertEqual(result['language'], 'en')
