@@ -170,11 +170,9 @@ class TestExtractorWorker(TaskTest):
                      " sure it also has non ascii chars.")
         filename = os.path.join(DATA_DIR, 'test_html_entities.txt')
         data = {'filename': filename,
-                'contents': base64.b64encode(open(filename).read())}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['text'], expected)
+                'contents': base64.b64encode(open(filename, 'rb').read())}
+        result = Extractor().process(data)
+        self.assertEqual(result['text'], expected)
 
     def test_should_detect_encoding_and_return_a_unicode_object(self):
         expected = "Flávio"
