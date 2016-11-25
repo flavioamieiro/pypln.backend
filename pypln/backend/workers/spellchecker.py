@@ -20,22 +20,22 @@
 
 import enchant
 from enchant.checker import SpellChecker
+
 from pypln.backend.celery_task import PyPLNTask
+
 
 class SpellingChecker(PyPLNTask):
     """
     This worker performs spellchecking in the plain text of a document
     """
     def __init__(self):
-        # This method is only called once per process, but that is no problem
-        # since the enchant languange list should not change. Don't use this
-        # method for anything that should run every time the task is called.
-        # See http://docs.celeryproject.org/en/latest/userguide/tasks.html#instantiation
-        # for more information.
-        self.checkers = {lang: SpellChecker(lang) for lang in enchant.list_languages()}
+        # This method is only called once per process
+        self.checkers = {lang: SpellChecker(lang)
+                         for lang in enchant.list_languages()}
 
     def process(self, document):
-        #TODO: this worker may be enhanced by also checking the errors against an specific vocabulary supplied with the document
+        #TODO: this worker may be enhanced by also checking the errors against
+        # an specific vocabulary supplied with the document
         try:
             checker = self.checkers[document['language']]
             checker.set_text(document['text'])
@@ -44,4 +44,3 @@ class SpellingChecker(PyPLNTask):
             errors = None
 
         return {'spelling_errors': errors}
-
