@@ -28,6 +28,6 @@ class FreqDist(PyPLNTask):
         frequency_distribution = {token: tokens.count(token) \
                                   for token in set(tokens)}
         fd = list(frequency_distribution.items())
-        fd.sort(lambda x, y: cmp(y[1], x[1]))
+        fd.sort(key=lambda x: (-x[1], x[0]))
 
         return {'freqdist': fd}

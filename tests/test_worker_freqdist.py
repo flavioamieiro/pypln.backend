@@ -16,24 +16,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
+from unittest import TestCase
+
 from pypln.backend.workers import FreqDist
-from .utils import TaskTest
 
 
-class TestFreqDistWorker(TaskTest):
-    def test_freqdist_should_return_a_list_of_tuples_with_frequency_distribution(self):
+class TestFreqDistWorker(TestCase):
+    def test_freqdist_should_be_a_list_of_tuples_with_frequency_distribution(self):
         tokens = ['The', 'sky', 'is', 'blue', ',', 'the', 'sun', 'is',
                   'yellow', '.']
 
-        expected_fd =  [['is', 2], ['the', 2], ['blue', 1], ['sun', 1],
-                ['sky', 1], [',', 1], ['yellow', 1], ['.', 1]]
+        expected_fd = [('is', 2), ('the', 2), (',', 1), ('.', 1), ('blue', 1),
+                       ('sky', 1), ('sun', 1), ('yellow', 1)]
 
-
-        # This is just preparing the expected input in the database
-        doc_id = self.collection.insert({'tokens': tokens}, w=1)
-
-        FreqDist().delay(doc_id)
-
-        resulting_fd = self.collection.find_one({'_id': doc_id})['freqdist']
-
+        resulting_fd = FreqDist().process({'tokens': tokens})['freqdist']
         self.assertEqual(resulting_fd, expected_fd)
