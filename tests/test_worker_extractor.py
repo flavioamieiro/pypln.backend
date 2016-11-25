@@ -187,11 +187,9 @@ class TestExtractorWorker(TaskTest):
         contents = "This is a test file. I'm testing PyPLN extractor worker!"
         filename = os.path.join(DATA_DIR, 'text_file')
         data = {'filename': filename,
-                'contents': base64.b64encode(contents)}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['mimetype'], 'text/plain')
+                'contents': base64.b64encode(contents.encode('utf-8'))}
+        result = Extractor().process(data)
+        self.assertEqual(result['mimetype'], 'text/plain')
 
     def test_unknown_mimetype_should_be_flagged(self):
         filename = os.path.join(DATA_DIR, 'random_file')
