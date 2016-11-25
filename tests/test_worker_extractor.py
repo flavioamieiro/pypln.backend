@@ -25,6 +25,7 @@ from .utils import TaskTest
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
 
+
 class TestExtractorWorker(TaskTest):
     def test_extraction_from_text_file(self):
         expected = "This is a test file.\nI'm testing PyPLN extractor worker!"
@@ -200,16 +201,13 @@ class TestExtractorWorker(TaskTest):
         filename = os.path.join(DATA_DIR, 'random_file')
         # we can't put the expected text content here, so we'll just make sure
         # it's equal to the input content, since
-        contents = open(filename).read()
-        data = {'filename': filename,
-                'contents': base64.b64encode(contents)}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['mimetype'], 'unknown')
-        self.assertEqual(refreshed_document['text'], "")
-        self.assertEqual(refreshed_document['language'], "")
-        self.assertEqual(refreshed_document['file_metadata'], {})
+        contents = open(filename, 'rb').read()
+        result = Extractor().process({'filename': filename,
+                                      'contents': base64.b64encode(contents)})
+        self.assertEqual(result['mimetype'], 'unknown')
+        self.assertEqual(result['text'], "")
+        self.assertEqual(result['language'], "")
+        self.assertEqual(result['file_metadata'], {})
 
     def test_unknown_encoding_should_be_ignored(self):
         filename = os.path.join(DATA_DIR, 'encoding_unknown_to_libmagic.txt')
