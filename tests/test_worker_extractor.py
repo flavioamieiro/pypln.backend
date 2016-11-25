@@ -178,12 +178,10 @@ class TestExtractorWorker(TaskTest):
         expected = "Flávio"
         filename = os.path.join(DATA_DIR, 'test_iso-8859-1.txt')
         data = {'filename': filename,
-                'contents': base64.b64encode(open(filename).read())}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['text'], expected)
-        self.assertEqual(type(refreshed_document['text']), str)
+                'contents': base64.b64encode(open(filename, 'rb').read())}
+        result = Extractor().process(data)
+        self.assertEqual(result['text'], expected)
+        self.assertEqual(type(result['text']), str)
 
     def test_should_guess_mimetype_for_file_without_extension(self):
         contents = "This is a test file. I'm testing PyPLN extractor worker!"
