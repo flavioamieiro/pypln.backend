@@ -16,12 +16,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with PyPLN.  If not, see <http://www.gnu.org/licenses/>.
-
+import warnings
 
 import enchant
 from enchant.checker import SpellChecker
 
 from pypln.backend.celery_task import PyPLNTask
+
+
+class MissingDictionaryWarning(RuntimeWarning):
+    pass
 
 
 class SpellingChecker(PyPLNTask):
@@ -34,13 +38,21 @@ class SpellingChecker(PyPLNTask):
                          for lang in enchant.list_languages()}
 
     def process(self, document):
-        #TODO: this worker may be enhanced by also checking the errors against
+        # TODO: this worker may be enhanced by also checking the errors against
         # an specific vocabulary supplied with the document
-        try:
-            checker = self.checkers[document['language']]
-            checker.set_text(document['text'])
-            errors = [[e.word, e.wordpos, e.suggest()] for e in checker]
-        except KeyError:
+        checker = self.checkers.get(document['language'])
+        if checker is None:
+            # Maybe this should be an exception instead
+            warnings.warn('%s dictionary missing. If running on linux, '
+                          'install the corresponding myspell package'
+                          % document['language'],
+                          MissingDictionaryWarning)
             errors = None
+        else:
+            try:
+                checker.set_text(document['text'])
+                errors = [[e.word, e.wordpos, e.suggest()] for e in checker]
+            except KeyError:
+                errors = None
 
         return {'spelling_errors': errors}
