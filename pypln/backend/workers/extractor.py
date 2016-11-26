@@ -87,7 +87,7 @@ def parse_html(html, remove_tags=None, remove_inside=None,
     result = ''.join(sum(list(zip(content_between, complete_tags)), tuple()))
     return clean(result)
 
-def get_pdf_metadata(data):
+def get_pdf_metadata(data: str) -> dict:
     lines = data.strip().splitlines()
     metadata = {}
     for line in lines:
@@ -98,7 +98,7 @@ def get_pdf_metadata(data):
         metadata[key.strip()] = value.strip()
     return metadata
 
-def extract_pdf(data):
+def extract_pdf(data: bytes) -> (str, dict):
     temp = NamedTemporaryFile(delete=False)
     filename = temp.name
     temp.close()
@@ -112,14 +112,16 @@ def extract_pdf(data):
     unlink(filename + '_ind.html')
     unlink(filename + 's.html')
     text = parse_html(html.replace('&#160;', ' '), True, ['script', 'style'])
-    pdfinfo = Popen(shlex.split('pdfinfo -'), stdin=PIPE, stdout=PIPE,
-                    stderr=PIPE)
-    meta_out, meta_err = pdfinfo.communicate(input=data)
+
+    info_process = Popen(shlex.split('pdfinfo -'), stdin=PIPE, stdout=PIPE,
+                         stderr=PIPE)
+    meta_out, meta_err = info_process.communicate(input=data)
     try:
-        metadata = get_pdf_metadata(meta_out)
-    except:
+        metadata = get_pdf_metadata(meta_out.decode('utf-8'))
+    except Exception:
+        # TODO: what should I do here?
         metadata = {}
-        #TODO: what should I do here?
+
     if not (text and metadata):
         return '', {}
     elif not html_err:
@@ -128,7 +130,7 @@ def extract_pdf(data):
         return '', {}
 
 
-def trial_decode(text):
+def trial_decode(text: bytes) -> str:
     """
     Tries to detect text encoding using `magic`. If the detected encoding is
     not supported, try utf-8, iso-8859-1 and ultimately falls back to decoding
@@ -173,6 +175,7 @@ class Extractor(PyPLNTask):
         contents = base64.b64decode(file_data['contents'])
         with magic.Magic(flags=magic.MAGIC_MIME_TYPE) as m:
             file_mime_type = m.id_buffer(contents)
+
         metadata = {}
         if file_mime_type == 'text/plain':
             text = contents
@@ -191,7 +194,9 @@ class Extractor(PyPLNTask):
             return {'mimetype': 'unknown', 'text': "",
                     'file_metadata': {}, 'language': ""}
 
-        text, forced_decoding = trial_decode(text)
+        forced_decoding = False
+        if isinstance(text, bytes):
+            text, forced_decoding = trial_decode(text)
 
         if isinstance(text, str):
             # HTMLParser only handles unicode objects. We can't pass the text
