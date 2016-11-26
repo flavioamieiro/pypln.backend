@@ -20,23 +20,23 @@
 import base64
 import os
 from textwrap import dedent
+from unittest import TestCase
+
 from pypln.backend.workers import Extractor
-from .utils import TaskTest
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
 
 
-class TestExtractorWorker(TaskTest):
+class TestExtractorWorker(TestCase):
     def test_extraction_from_text_file(self):
         expected = "This is a test file.\nI'm testing PyPLN extractor worker!"
         filename = os.path.join(DATA_DIR, 'test.txt')
-        doc_id = self.collection.insert({'filename': filename,
-            'contents': base64.b64encode(open(filename).read())}, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['text'], expected)
-        self.assertEqual(refreshed_document['file_metadata'], {})
-        self.assertEqual(refreshed_document['mimetype'], 'text/plain')
+        data = {'filename': filename,
+                'contents': base64.b64encode(open(filename, 'rb').read())}
+        result = Extractor().process(data)
+        self.assertEqual(result['text'], expected)
+        self.assertEqual(result['file_metadata'], {})
+        self.assertEqual(result['mimetype'], 'text/plain')
 
     def test_extraction_from_html_file(self):
         expected = "This is a test file. I'm testing PyPLN extractor worker!"
@@ -47,23 +47,19 @@ class TestExtractorWorker(TaskTest):
         # wasn't a problem before because with mongodict we used to keep a
         # pickled representation of the data.
         data = {'filename': filename,
-                'contents': base64.b64encode(open(filename).read())}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['text'], expected)
-        self.assertEqual(refreshed_document['file_metadata'], {})
-        self.assertEqual(refreshed_document['mimetype'], 'text/html')
+                'contents': base64.b64encode(open(filename, 'rb').read())}
+        result = Extractor().process(data)
+        self.assertEqual(result['text'], expected)
+        self.assertEqual(result['file_metadata'], {})
+        self.assertEqual(result['mimetype'], 'text/html')
 
     def test_extraction_from_pdf_file(self):
         expected = "This is a test file.\nI'm testing PyPLN extractor worker!"
         filename = os.path.join(DATA_DIR, 'test.pdf')
         data = {'filename': filename,
-                'contents': base64.b64encode(open(filename).read())}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['text'], expected)
+                'contents': base64.b64encode(open(filename, 'rb').read())}
+        result = Extractor().process(data)
+        self.assertEqual(result['text'], expected)
         # Check that the expected metadata is a subset of what
         # our Extractor found (it may have found more details
         # depending on the toolset used to extract metadata)
@@ -80,14 +76,14 @@ class TestExtractorWorker(TaskTest):
                 'PDF version':    '1.4',
         }
         metadata_expected_set = set(metadata_expected.items())
-        metadata = refreshed_document['file_metadata']
+        metadata = result['file_metadata']
         metadata_set = set(metadata.items())
         diff_set = metadata_expected_set - metadata_set
         self.assertTrue(metadata_expected_set.issubset(metadata_set),
                         ("Extracted metadata is not a subset of the expected metadata. "
                          "Items missing or with different values: {}").format(
                          ", ".join(str(item) for item in diff_set)))
-        self.assertEqual(refreshed_document['mimetype'], 'application/pdf')
+        self.assertEqual(result['mimetype'], 'application/pdf')
 
     def test_extraction_from_html(self):
         contents = dedent('''
@@ -114,9 +110,8 @@ class TestExtractorWorker(TaskTest):
         </html>
         ''')
         data = {'filename': 'test.html',
-                'contents': base64.b64encode(contents)}
-        doc_id = self.collection.insert(data, w=1)
-        Extractor().delay(doc_id)
+                'contents': base64.b64encode(contents.encode('utf-8'))}
+        result = Extractor().process(data)
         expected = dedent('''
             Testing
 
@@ -134,36 +129,29 @@ class TestExtractorWorker(TaskTest):
             bla1
 
             bla2''').strip()
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['text'], expected)
-        self.assertEqual(refreshed_document['mimetype'], 'text/html')
+        self.assertEqual(result['text'], expected)
+        self.assertEqual(result['mimetype'], 'text/html')
 
     def test_language_detection_pt(self):
-        text_pt = 'Esse texto foi escrito por Álvaro em Português.'
-        data_pt = {'filename': 'text-pt.txt',
-                'contents': base64.b64encode(text_pt)}
-        doc_id = self.collection.insert(data_pt, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['language'], 'pt')
+        text = 'Esse texto foi escrito por Álvaro em Português.'
+        data = {'filename': 'text-pt.txt',
+                'contents': base64.b64encode(text.encode('utf-8'))}
+        result = Extractor().process(data)
+        self.assertEqual(result['language'], 'pt')
 
     def test_language_detection_es(self):
-        text_es = 'Este texto ha sido escrito en Español por Álvaro.'
-        data_es = {'filename': 'text-es.txt',
-                'contents': base64.b64encode(text_es)}
-        doc_id = self.collection.insert(data_es, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['language'], 'es')
+        text = 'Este texto ha sido escrito en Español por Álvaro.'
+        data = {'filename': 'text-es.txt',
+                'contents': base64.b64encode(text.encode('utf-8'))}
+        result = Extractor().process(data)
+        self.assertEqual(result['language'], 'es')
 
     def test_language_detection_en(self):
-        text_en = 'This text was written by Álvaro in English.'
-        data_en = {'filename': 'text-en.txt',
-                'contents': base64.b64encode(text_en)}
-        doc_id = self.collection.insert(data_en, w=1)
-        Extractor().delay(doc_id)
-        refreshed_document = self.collection.find_one({'_id': doc_id})
-        self.assertEqual(refreshed_document['language'], 'en')
+        text = 'This text was written by Álvaro in English.'
+        data = {'filename': 'text-en.txt',
+                'contents': base64.b64encode(text.encode('utf-8'))}
+        result =  Extractor().process(data)
+        self.assertEqual(result['language'], 'en')
 
     def test_unescape_html_entities(self):
         expected = ("This text has html <entities>. Álvaro asked me to make"
