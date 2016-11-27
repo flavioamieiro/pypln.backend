@@ -166,10 +166,10 @@ class Extractor(PyPLNTask):
             file_mime_type = m.id_buffer(contents)
 
         metadata = {}
-        if file_mime_type == 'text/plain':
-            text = contents
-        elif file_mime_type == 'text/html':
-            text = parse_html(contents, True, ['script', 'style'])
+        if file_mime_type in ('text/plain', 'text/html'):
+            text = decode_text_bytes(contents)
+            if file_mime_type == 'text/html':
+                text = parse_html(text, True, ['script', 'style'])
         elif file_mime_type == 'application/pdf':
             text, metadata = extract_pdf(contents)
         else:
@@ -182,9 +182,6 @@ class Extractor(PyPLNTask):
             # StopPipeline) as a signal to stop processing this pipeline.
             return {'mimetype': 'unknown', 'text': "",
                     'file_metadata': {}, 'language': ""}
-
-        if isinstance(text, bytes):
-            text = decode_text_bytes(text)
 
         if isinstance(text, str):
             # HTMLParser only handles unicode objects. We can't pass the text
