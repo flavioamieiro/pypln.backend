@@ -194,10 +194,17 @@ class Extractor(PyPLNTask):
         text = clean(text)
 
         if isinstance(text, str):
-            language = cld.detect(text.encode('utf-8'))[1]
+            languages = cld.detect(text.encode('utf-8'))[2]
         else:
-            language = cld.detect(text)[1]
+            languages = cld.detect(text)[2]
+
+        detected_language = None
+        if languages:
+            detected_language = languages[0][1]
 
         # TODO: check for uses of forced_decoding and remove them
-        return {'text': text, 'file_metadata': metadata, 'language': language,
-                'mimetype': file_mime_type, 'forced_decoding': None}
+        return {'text': text,
+                'file_metadata': metadata,
+                'language': detected_language,
+                'mimetype': file_mime_type,
+                'forced_decoding': None}
