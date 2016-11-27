@@ -130,41 +130,30 @@ def extract_pdf(data: bytes) -> (str, dict):
         return '', {}
 
 
-def trial_decode(text: bytes) -> str:
+def decode_text_bytes(text: bytes) -> str:
     """
-    Tries to detect text encoding using `magic`. If the detected encoding is
-    not supported, try utf-8, iso-8859-1 and ultimately falls back to decoding
-    as utf-8 replacing invalid chars with `U+FFFD` (the replacement character).
-
-    This is far from an ideal solution, but the extractor and the rest of the
-    pipeline need an unicode object.
+    Tries to detect text encoding using file magic. If that fails or the
+    detected encoding is not supported, tries using utf-8. If that doesn't work
+    tries using iso8859-1.
     """
-    with magic.Magic(flags=magic.MAGIC_MIME_ENCODING) as m:
-        content_encoding = m.id_buffer(text)
-
-    forced_decoding = False
     try:
-        result = text.decode(content_encoding)
-    except LookupError:
-        # If the detected encoding is not supported, we try to decode it as
-        # utf-8.
+        with magic.Magic(flags=magic.MAGIC_MIME_ENCODING) as m:
+            content_encoding = m.id_buffer(text)
+    except magic.MagicError:
+        pass  # This can happen for instance if text is a single char
+    else:
         try:
-            result = text.decode('utf-8')
-        except UnicodeDecodeError:
-            # Is there a better way of doing this than nesting try/except
-            # blocks? This smells really bad.
-            try:
-                result = text.decode('iso-8859-1')
-            except UnicodeDecodeError:
-                # If neither utf-8 nor iso-885901 work are capable of handling
-                # this text, we just decode it using utf-8 and replace invalid
-                # chars with U+FFFD.
-                # Two somewhat arbitrary decisions were made here: use utf-8
-                # and use 'replace' instead of 'ignore'.
-                result = text.decode('utf-8', 'replace')
-                forced_decoding = True
+            return text.decode(content_encoding)
+        except LookupError:  # The detected encoding is not supported
+            pass
 
-    return result, forced_decoding
+    try:
+        result = text.decode('utf-8')
+    except UnicodeDecodeError:
+        # Decoding with iso8859-1 doesn't raise UnicodeDecodeError, so this is
+        # a last resort.
+        result = text.decode('iso8859-1')
+    return result
 
 
 class Extractor(PyPLNTask):
@@ -194,9 +183,8 @@ class Extractor(PyPLNTask):
             return {'mimetype': 'unknown', 'text': "",
                     'file_metadata': {}, 'language': ""}
 
-        forced_decoding = False
         if isinstance(text, bytes):
-            text, forced_decoding = trial_decode(text)
+            text = decode_text_bytes(text)
 
         if isinstance(text, str):
             # HTMLParser only handles unicode objects. We can't pass the text
@@ -213,5 +201,6 @@ class Extractor(PyPLNTask):
         else:
             language = cld.detect(text)[1]
 
+        # TODO: check for uses of forced_decoding and remove them
         return {'text': text, 'file_metadata': metadata, 'language': language,
-                'mimetype': file_mime_type, 'forced_decoding': forced_decoding}
+                'mimetype': file_mime_type, 'forced_decoding': None}

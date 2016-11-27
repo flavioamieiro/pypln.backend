@@ -21,10 +21,66 @@ import base64
 import os
 from textwrap import dedent
 from unittest import TestCase
+from unittest.mock import patch, Mock, MagicMock, call
+
+from magic import MagicError
 
 from pypln.backend.workers import Extractor
+from pypln.backend.workers.extractor import decode_text_bytes
 
 DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
+
+
+class DecodeTextBytesTest(TestCase):
+    def setUp(self):
+        magic_mock = MagicMock()
+        magic_identifier = Mock()
+        self.id_buffer_mock = Mock(return_value='magic_codec')
+        magic_identifier.id_buffer = self.id_buffer_mock
+        magic_mock.return_value.__enter__.return_value = magic_identifier
+        self.magic_patcher = patch('magic.Magic', magic_mock)
+
+    def test_ignores_magic_error(self):
+        self.id_buffer_mock.side_effect = MagicError()
+        text = Mock()
+        with self.magic_patcher:
+            result = decode_text_bytes(text)
+        self.assertEqual(result, text.decode.return_value)
+        self.assertEqual(text.decode.call_args_list, [call('utf-8')])
+
+    def test_tries_decoding_with_encoding_returned_by_magic(self):
+        text = Mock()
+        with self.magic_patcher:
+            result = decode_text_bytes(text)
+        self.assertEqual(result, text.decode.return_value)
+        self.assertEqual(text.decode.call_args_list, [call('magic_codec')])
+
+    def test_tries_decoding_as_utf8(self):
+        text = Mock()
+        text.decode.side_effect = [LookupError(), 'result']
+        with self.magic_patcher:
+            result = decode_text_bytes(text)
+        self.assertEqual(result, 'result')
+        self.assertEqual(text.decode.call_args_list,
+                         [call('magic_codec'), call('utf-8')])
+
+    def test_tries_iso8859_1_if_all_else_fails(self):
+        text = Mock()
+
+        class FakeUnicodeDecodeError(UnicodeDecodeError):
+            def __init__(self):
+                pass
+
+        text.decode.side_effect = [LookupError(),
+                                   FakeUnicodeDecodeError(),
+                                   'result']
+        with self.magic_patcher:
+            result = decode_text_bytes(text)
+        self.assertEqual(result, 'result')
+        self.assertEqual(text.decode.call_args_list,
+                         [call('magic_codec'),
+                          call('utf-8'),
+                          call('iso8859-1')])
 
 
 class TestExtractorWorker(TestCase):
